@@ -1,0 +1,44 @@
+const socketMiddleware = require('../middlewares/socket-middleware');
+
+function listMachines(req, res, next) {
+    require('dotenv').config({ path: '.edge.env'}); 
+    const machineList = socketMiddleware.listSocket();
+
+    res.status(200).json({
+        'edge':`${process.env.NAME}`,
+        'robot':machineList
+    });  
+}
+
+/*
+ * {
+ *     "machineName",
+ *     "imageSrc",
+ *     "command"
+ * }
+ */
+function runImage(req, res, next) {    
+    // have to handle edge server case
+    socketMiddleware.runDockerImage(req.body.machineName, req.body.imageSrc, req.body.command)
+
+    res.status(200).json({'deploy_request':'success'});
+}
+
+/*
+ * {
+ *     "machineName"
+ * }
+ */
+async function getDockerStatus(req, res, next) {
+    const socket = await socketMiddleware.getSocketByName(req.query.machineName);
+
+    socket.emit('status', async function(data) {
+        res.status(200).send(data);
+    });
+}
+
+module.exports = {
+    listMachines: listMachines,
+    runImage: runImage,
+    getDockerStatus: getDockerStatus
+}
