@@ -53,11 +53,27 @@ function deleteSocket(socketID) {
     console.log(`${robotName} is unregistered`);
 }
 
-function runDockerImage(machineName, imageSrc, command) {
+function runDockerImage(machineName, options, imageSrc, command) {
     if(socketDic[machineName] == undefined) {
         // because of machine failure
     } else {
-        socketDic[machineName].emit('run', {'imageSrc':`${imageSrc}`,'command':`${command}`});
+        socketDic[machineName].emit('run', {'options':`${options}`,'imageSrc':`${imageSrc}`,'command':`${command}`});
+    }
+}
+
+function stopDockerImage(machineName, containerID) {
+    if(socketDic[machineName] == undefined) {
+        // because of machine failure
+    } else {
+        socketDic[machineName].emit('stop', {'containerID':`${containerID}`});
+    }
+}
+
+function stopAllImage(machineName) {
+    if(socketDic[machineName] == undefined) {
+        // because of machine failure
+    } else {
+        socketDic[machineName].emit('stopAll', 'request');
     }
 }
 
@@ -75,5 +91,7 @@ module.exports = {
     listSocket: listSocket,
     runDockerImage: runDockerImage,
     deleteSocket: deleteSocket,
+    stopDockerImage:stopDockerImage,
+    stopAllImage:stopAllImage,
     getSocketByName: getSocketByName
 }
