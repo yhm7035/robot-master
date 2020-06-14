@@ -5,8 +5,8 @@ function listMachines(req, res, next) {
     const machineList = socketMiddleware.listSocket();
 
     res.status(200).json({
-        'edge':`${process.env.NAME}`,
-        'robot':machineList
+        'master':`${process.env.NAME}`,
+        'machines':machineList
     });  
 }
 
