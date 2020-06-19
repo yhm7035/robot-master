@@ -16,28 +16,35 @@ function healthcheck(socket) {
     socket.emit('health_check', 'syn');
 }
 
-function manageSocketStatus(socket, robotName) {
+function manageSocketStatus(socket, data) {
     // register robot's name and socket
     // have to do dupulication check
     if(socketStatus[socket.id]==undefined) {
         socketStatus[socket.id] = {
-            'name':robotName,
-            'status':0
+            'name':data.name,
+            'status':0,
+            'base':data.base
         };
-        socketDic[robotName] = socket;
+        socketDic[data.name] = socket;
 
-        console.log(`${robotName} is registered`);
+        console.log(socketStatus[socket.id]);
+        console.log(`${data.name} is registered`);
     }
 
     socketStatus[socket.id].status = 0;
 }
 
 function listSocket() {
-    const socketList = [];
+    const socketList = {'docker':[], 'kube':[]};
 
     if(Object.keys(socketStatus).length > 0) {
         for(var key in socketStatus) {
-            socketList.push(socketStatus[key].name);
+            if(`${socketStatus[key].base}`=='docker') {
+                socketList.docker.push(`${socketStatus[key].name}`);
+            }
+            else if(`${socketStatus[key].base}`=='kube') {
+                socketList.kube.push(`${socketStatus[key].name}`);
+            }
         }
     }
 
